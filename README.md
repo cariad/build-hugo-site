@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build Hugo site
-        uses: cariad/build-hugo-site
+        uses: cariad/build-hugo-site@v0.1.1
 ```
 
 The action will assume that the root of your repository contains your Hugo site's source, and will build to a `build` subdirectory.

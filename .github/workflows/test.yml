@@ -1,0 +1,25 @@
+name: Test the GitHub Action
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Prepare test data
+        run: echo 'baseURL = "http://example.org/"\nlanguageCode = "en-us"\ntitle = "My New Hugo Site"' > config.toml
+
+      - name: Build and push
+        uses: cariad/build-hugo-site@$GITHUB_SHA
+
+      - name: Assert site was built
+        run: |
+          count=$(find . | wc -l)
+          if [ $count -eq 0 ]; then
+            exit 1
+          fi

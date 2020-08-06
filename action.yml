@@ -1,0 +1,15 @@
+name: Build a Hugo site
+description: Builds and minifies your Hugo site
+author: Cariad Eccleston
+branding:
+  icon: code
+  color: blue
+runs:
+  using: docker
+  image: docker://cariad/hugo-site-builder:v1.0.0
+  args:
+    - --source
+    - /github/workspace
+    - --destination
+    - /github/workspace/build
+    - --minify

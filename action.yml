@@ -4,7 +4,7 @@ branding:
   icon: code
   color: blue
 
-description: Build, validate and deploy a Hugo site
+description: ⚙️ Build 🔎 Validate 🎉 Deploy a Hugo site
 
 inputs:
   path:
@@ -23,7 +23,7 @@ inputs:
     description: S3 region
     required: false
 
-name: hugo-ci
+name: Build, validate and deploy a Hugo site
 
 runs:
   args:

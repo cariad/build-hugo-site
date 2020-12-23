@@ -1,15 +1,39 @@
-name: Build a Hugo site
-description: Builds and minifies your Hugo site
 author: Cariad Eccleston
+
 branding:
   icon: code
   color: blue
+
+description: Build, validate and deploy a Hugo site
+
+inputs:
+  path:
+    description: Path to site source
+    required: false
+
+  s3-bucket:
+    description: S3 bucket to upload to
+    required: false
+
+  s3-prefix:
+    description: S3 prefix to upload to
+    required: false
+
+  s3-region:
+    description: S3 region
+    required: false
+
+name: Hugo CI
+
 runs:
-  using: docker
-  image: docker://cariad/hugo-site-builder:v1.0.0
   args:
-    - --source
-    - /github/workspace
-    - --destination
-    - /github/workspace/build
-    - --minify
+    - --s3-bucket
+    - ${{ inputs.s3-bucket }}
+    - --s3-prefix
+    - ${{ inputs.s3-prefix }}
+    - --s3-region
+    - ${{ inputs.s3-region }}
+    - --workspace
+    - /github/workspace/${{ inputs.path }}
+  image: docker://cariad/hugo-ci:1.0.0a9
+  using: docker

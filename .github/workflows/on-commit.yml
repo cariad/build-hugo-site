@@ -1,0 +1,74 @@
+name: on-commit
+
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "**"
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_DEFAULT_REGION: us-east-1
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  S3_BUCKET: hugociaction-test-bucket-yzlltocanymu
+
+jobs:
+  test:
+    container: cariad/ci:1.2.0
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: test.sh
+        run: ./test.sh
+
+  test_root:
+    container: cariad/ci:1.2.0
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: ./scripts/make-source.sh .
+      - uses: ./
+      - run: ./scripts/assert.sh public
+
+  test_subdirectory:
+    container: cariad/ci:1.2.0
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: ./scripts/make-source.sh subdirectory
+      - uses: ./
+        with:
+          path: subdirectory
+      - run: ./scripts/assert.sh subdirectory/public
+
+  test_upload:
+    container: cariad/ci:1.2.0
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: aws s3 rm "s3://${S3_BUCKET:?}" --recursive
+      - run: ./scripts/make-source.sh .
+      - name: Invoke
+        uses: ./
+        with:
+          s3-bucket: ${{ env.S3_BUCKET }}
+      - run: aws s3 sync "s3://${S3_BUCKET:?}" ./uploaded
+      - run: ./scripts/assert.sh uploaded
+
+  test_upload_with_prefix:
+    container: cariad/ci:1.2.0
+    needs:
+      - test_upload  # Don't trample over S3
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: aws s3 rm "s3://${S3_BUCKET:?}" --recursive
+      - run: ./scripts/make-source.sh .
+      - name: Invoke
+        uses: ./
+        with:
+          s3-bucket: ${{ env.S3_BUCKET }}
+          s3-prefix: ${{ github.sha }}
+      - run: aws s3 sync "s3://${S3_BUCKET:?}/${GITHUB_SHA:?}" ./uploaded
+      - run: ./scripts/assert.sh uploaded

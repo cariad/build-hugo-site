@@ -35,5 +35,5 @@ runs:
     - ${{ inputs.s3-region }}
     - --workspace
     - /github/workspace/${{ inputs.path }}
-  image: docker://cariad/hugo-ci:1.0.0a9
+  image: docker://cariad/hugo-ci:1.0.0
   using: docker

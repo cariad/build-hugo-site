@@ -23,7 +23,7 @@ inputs:
     description: S3 region
     required: false
 
-name: Hugo CI
+name: hugo-ci
 
 runs:
   args:
